@@ -73,7 +73,7 @@ class Discord(object):
         presence_payload["details"] = self.ffi.new(
             "char[]", bytes("Editing {}".format(basename(filename)), "utf8")
         )
-        presence_payload["largeImageKey"] = self.ffi.new("char[]", b"vim")
+        presence_payload["largeImageKey"] = self.ffi.new("char[]", b"neovim")
         presence_payload["largeImageText"] = self.ffi.new(
             "char[]", b"The One True Editor"
         )
