@@ -8,7 +8,7 @@ import atexit
 class DiscordPlugin(object):
     def __init__(self, vim):
         self.vim = vim
-        self.discord = Discord(b"382909573021040650")
+        self.discord = Discord(b"383069395896762369")
         # Ratelimits
         self.lastfilename = None
         self.lastused = False
