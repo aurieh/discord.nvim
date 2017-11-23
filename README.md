@@ -29,6 +29,7 @@ call dein#add('aurieh/discord.nvim')
 To finish things off, call `:UpdateRemotePlugins` and restart NeoVim.
 
 # TODO
+- [ ] Multiple clients: wait for lock
 - [ ] Rewrite the client in pure python, no cffi
 - [X] Upload some language icons
 - [X] Make the client ID configurable
