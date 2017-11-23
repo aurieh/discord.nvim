@@ -1,5 +1,5 @@
 # Discord.NVIM
-Discord Rich Presence for NeoVim.
+Discord Rich Presence for Neovim.
 
 # Install
 Clone and build [discordapp/discord-rpc](https://github.com/discordapp/discord-rpc):
