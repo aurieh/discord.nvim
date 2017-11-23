@@ -8,13 +8,12 @@ import atexit
 class DiscordPlugin(object):
     def __init__(self, vim):
         self.vim = vim
-        self.discord = Discord(b"383069395896762369")
+        self.discord = None
         # Ratelimits
         self.lastfilename = None
         self.lastused = False
         self.lasttimestamp = time()
         self.cbtimer = None
-        atexit.register(self.discord.shutdown)
 
     @neovim.autocmd("BufEnter", "*")
     def on_bufenter(self):
@@ -28,6 +27,12 @@ class DiscordPlugin(object):
     #
     @neovim.command("DiscordUpdatePresence")
     def update_presence(self):
+        if not self.discord:
+            self.discord = Discord(bytes(
+                self.vim.eval("discord#get_clientid()"),
+                "us-ascii"
+            ))
+            atexit.register(self.discord.shutdown)
         filename = self.vim.current.buffer.name
         ft = self.vim.eval(
             "getbufvar({}, '&ft')".format(self.vim.current.buffer.number)

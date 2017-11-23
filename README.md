@@ -31,6 +31,6 @@ To finish things off, call `:UpdateRemotePlugins` and restart NeoVim.
 # TODO
 - [ ] Rewrite the client in pure python, no cffi
 - [X] Upload some language icons
-- [ ] Make the client ID configurable
+- [X] Make the client ID configurable
 - [ ] Documentation
 - [ ] Tests
