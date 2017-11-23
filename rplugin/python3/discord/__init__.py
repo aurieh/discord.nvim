@@ -34,6 +34,8 @@ class DiscordPlugin(object):
             ))
             atexit.register(self.discord.shutdown)
         filename = self.vim.current.buffer.name
+        if not filename:
+            return
         ft = self.vim.eval(
             "getbufvar({}, '&ft')".format(self.vim.current.buffer.number)
         )
