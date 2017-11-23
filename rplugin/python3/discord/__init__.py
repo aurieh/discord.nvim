@@ -11,8 +11,9 @@ class DiscordPlugin(object):
         self.discord = Discord(b"382909573021040650")
         # Ratelimits
         self.lastfilename = None
-        self.numreqs = 0
+        self.lastused = False
         self.lasttimestamp = time()
+        self.cbtimer = None
         atexit.register(self.discord.shutdown)
 
     @neovim.autocmd("BufEnter", "*")
@@ -32,16 +33,26 @@ class DiscordPlugin(object):
             "getbufvar({}, '&ft')".format(self.vim.current.buffer.number)
         )
         if self.is_ratelimited(filename):
+            if self.cbtimer:
+                self.vim.eval("timer_stop({})".format(self.cbtimer))
+            self.cbtimer = self.vim.eval(
+                "timer_start(15, '_DiscordRunScheduled')"
+            )
             return
         self.discord.update_presence(filename, ft)
+
+    @neovim.function("_DiscordRunScheduled")
+    def run_scheduled(self, args):
+        self.cbtimer = None
+        self.update_presence()
 
     def is_ratelimited(self, filename):
         if self.lastfilename == filename:
             return True
         now = time()
-        if (now - self.lasttimestamp) >= 60:
+        if (now - self.lasttimestamp) >= 15:
+            self.lastused = False
             self.lasttimestamp = now
-            self.numreqs = 0
-        self.numreqs += 1
-        if self.numreqs > 5:
+        if self.lastused:
             return True
+        self.lastused = True
