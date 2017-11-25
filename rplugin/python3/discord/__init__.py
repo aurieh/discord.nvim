@@ -6,6 +6,9 @@ import atexit
 import neovim
 
 
+FT_BLACKLIST = ["help"]
+
+
 @neovim.plugin
 class DiscordPlugin(object):
     def __init__(self, vim):
@@ -47,12 +50,15 @@ class DiscordPlugin(object):
                 "us-ascii"
             ))
             atexit.register(self.shutdown)
+        ro = self.get_current_buf_var("&ro")
+        if ro:
+            return
         filename = self.vim.current.buffer.name
         if not filename:
             return
-        ft = self.vim.eval(
-            "getbufvar({}, '&ft')".format(self.vim.current.buffer.number)
-        )
+        ft = self.get_current_buf_var("&ft")
+        if ft in FT_BLACKLIST:
+            return
         if self.is_ratelimited(filename):
             if self.cbtimer:
                 self.vim.eval("timer_stop({})".format(self.cbtimer))
@@ -62,6 +68,11 @@ class DiscordPlugin(object):
             return
         self.log("info: update presence")
         self.discord.update_presence(filename, ft)
+
+    def get_current_buf_var(self, var):
+        return self.vim.eval(
+            "getbufvar({}, '{}')".format(self.vim.current.buffer.number, var)
+        )
 
     @neovim.function("_DiscordRunScheduled")
     def run_scheduled(self, args):
