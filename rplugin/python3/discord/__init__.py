@@ -60,6 +60,7 @@ class DiscordPlugin(object):
                 "timer_start(15, '_DiscordRunScheduled')"
             )
             return
+        self.log("info: update presence")
         self.discord.update_presence(filename, ft)
 
     @neovim.function("_DiscordRunScheduled")

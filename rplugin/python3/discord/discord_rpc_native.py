@@ -1,6 +1,7 @@
 import cffi
 from os.path import basename, exists, join
 from os import environ as env
+from time import time
 
 
 DISCORD_DEF = """
@@ -77,6 +78,7 @@ class Discord(object):
         presence_payload["largeImageText"] = self.ffi.new(
             "char[]", b"The One True Editor"
         )
+        presence_payload["startTimestamp"] = int(time())
         # FIXME: Refactor
         if len(filetype) > 0:
             presence_payload["smallImageKey"] = self.ffi.new(
