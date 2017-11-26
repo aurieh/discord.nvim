@@ -20,7 +20,7 @@ Plugin 'aurieh/discord.nvim'
 ```
 [Plug](https://github.com/junegunn/vim-plug):
 ```
-Plug 'aurieh/discord.nvim'
+Plug 'aurieh/discord.nvim', { 'do': ':UpdateRemotePlugins'}
 ```
 [dein](https://github.com/Shougo/dein.vim):
 ```
