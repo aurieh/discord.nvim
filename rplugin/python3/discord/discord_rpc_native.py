@@ -69,7 +69,7 @@ class Discord(object):
             self.ffi.NULL, 0, b"",
         )
 
-    def update_presence(self, filename, filetype):
+    def update_presence(self, filename, filetype, workspace):
         presence_payload = {}
         presence_payload["details"] = self.ffi.new(
             "char[]", bytes("Editing {}".format(basename(filename)), "utf8")
@@ -86,6 +86,10 @@ class Discord(object):
             )
             presence_payload["smallImageText"] = self.ffi.new(
                 "char[]", bytes(filetype, "us-ascii")
+            )
+        if len(workspace) > 0:
+            presence_payload["state"] = self.ffi.new(
+                "char[]", bytes("Working on {}".format(workspace), "utf8")
             )
         self.lib.Discord_UpdatePresence(
             self.ffi.new("DiscordRichPresence*", presence_payload)

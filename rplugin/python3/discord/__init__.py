@@ -1,6 +1,6 @@
 from .discord_rpc_native import Discord
 from .pidlock import PidLock, get_tempdir
-from os.path import join
+from os.path import join, basename
 from time import time
 import atexit
 import neovim
@@ -46,7 +46,7 @@ class DiscordPlugin(object):
                 self.log("warn: pidfile exists")
                 return
             self.discord = Discord(bytes(
-                self.vim.eval("discord#get_clientid()"),
+                self.vim.eval("discord#GetClientID()"),
                 "us-ascii"
             ))
             atexit.register(self.shutdown)
@@ -59,6 +59,7 @@ class DiscordPlugin(object):
         ft = self.get_current_buf_var("&ft")
         if ft in FT_BLACKLIST:
             return
+        workspace = self.get_workspace()
         if self.is_ratelimited(filename):
             if self.cbtimer:
                 self.vim.eval("timer_stop({})".format(self.cbtimer))
@@ -67,12 +68,19 @@ class DiscordPlugin(object):
             )
             return
         self.log("info: update presence")
-        self.discord.update_presence(filename, ft)
+        self.discord.update_presence(filename, ft, workspace)
 
     def get_current_buf_var(self, var):
         return self.vim.eval(
             "getbufvar({}, '{}')".format(self.vim.current.buffer.number, var)
         )
+
+    def get_workspace(self):
+        bufnr = self.vim.current.buffer.number
+        dirpath = self.vim.eval("discord#GetProjectDir({})".format(bufnr))
+        if dirpath:
+            return basename(dirpath)
+        return None
 
     @neovim.function("_DiscordRunScheduled")
     def run_scheduled(self, args):
