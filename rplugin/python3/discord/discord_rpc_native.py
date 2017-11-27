@@ -80,14 +80,14 @@ class Discord(object):
         )
         presence_payload["startTimestamp"] = int(time())
         # FIXME: Refactor
-        if len(filetype) > 0:
+        if filetype:
             presence_payload["smallImageKey"] = self.ffi.new(
                 "char[]", bytes(filetype, "us-ascii")
             )
             presence_payload["smallImageText"] = self.ffi.new(
                 "char[]", bytes(filetype, "us-ascii")
             )
-        if len(workspace) > 0:
+        if workspace:
             presence_payload["state"] = self.ffi.new(
                 "char[]", bytes("Working on {}".format(workspace), "utf8")
             )
