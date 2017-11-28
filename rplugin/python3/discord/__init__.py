@@ -1,4 +1,4 @@
-from .discord_rpc_native import Discord
+from .discord_rpc import Discord
 from .pidlock import PidLock, get_tempdir
 from os.path import join, basename
 from time import time
@@ -40,15 +40,15 @@ class DiscordPlugin(object):
         if self.locked:
             return
         if not self.discord:
+            client_id = self.vim.eval("discord#GetClientID()")
             self.log("info: init")
             self.locked = not self.lock.lock()
             if self.locked:
                 self.log("warn: pidfile exists")
                 return
-            self.discord = Discord(bytes(
-                self.vim.eval("discord#GetClientID()"),
-                "us-ascii"
-            ))
+            self.discord = Discord()
+            self.discord.connect()
+            self.discord.handshake(client_id)
             atexit.register(self.shutdown)
         ro = self.get_current_buf_var("&ro")
         if ro:
@@ -68,7 +68,22 @@ class DiscordPlugin(object):
             )
             return
         self.log("info: update presence")
-        self.discord.update_presence(filename, ft, workspace)
+        self._update_presence(filename, ft, workspace)
+
+    def _update_presence(self, filename, ft, workspace):
+        activity = {}
+        activity["details"] = "Editing {}".format(basename(filename))
+        activity["assets"] = {
+            "large_text": "The One True Editor",
+            "large_image": "neovim"
+        }
+        activity["timestamps"] = {"start": time()}
+        if ft:
+            activity["assets"]["small_text"] = ft
+            activity["assets"]["small_image"] = ft
+        if workspace:
+            activity["state"] = "Working on {}".format(workspace)
+        self.discord.set_activity(activity, self.vim.eval("getpid()"))
 
     def get_current_buf_var(self, var):
         return self.vim.eval(

@@ -2,16 +2,6 @@
 Discord Rich Presence for Neovim.
 
 # Install
-Clone and build [discordapp/discord-rpc](https://github.com/discordapp/discord-rpc):
-```
-git clone https://github.com/discordapp/discord-rpc.git && cd discord-rpc
-cmake -DBUILD_SHARED_LIBS=on .
-make
-```
-Copy the resulting shared library to either `~/.local/lib`, `/lib` or `/usr/lib`.
-```
-cp src/libdiscord-rpc.so ~/.local/lib/
-```
 Install the plugin using your favorite plugin manager:
 
 [Vundle](https://github.com/VundleVim/Vundle.vim):
@@ -26,11 +16,11 @@ Plug 'aurieh/discord.nvim', { 'do': ':UpdateRemotePlugins'}
 ```
 call dein#add('aurieh/discord.nvim')
 ```
-To finish things off, call `:UpdateRemotePlugins` and restart NeoVim.
+To finish things off, call `:UpdateRemotePlugins` and restart Neovim.
 
 # TODO
 - [ ] Multiple clients: wait for lock
-- [ ] Rewrite the client in pure python, no cffi
+- [X] Rewrite the client in pure python, no cffi
 - [X] Upload some language icons
 - [X] Make the client ID configurable
 - [ ] Documentation
