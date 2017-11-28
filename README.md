@@ -35,3 +35,4 @@ To finish things off, call `:UpdateRemotePlugins` and restart NeoVim.
 - [X] Make the client ID configurable
 - [ ] Documentation
 - [ ] Tests
+- [ ] Pack ratelimit data in pidfiles

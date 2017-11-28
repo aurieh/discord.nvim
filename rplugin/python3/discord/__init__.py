@@ -94,6 +94,7 @@ class DiscordPlugin(object):
     def is_ratelimited(self, filename):
         if self.lastfilename == filename:
             return True
+        self.lastfilename = filename
         now = time()
         if (now - self.lasttimestamp) >= 15:
             self.lastused = False
