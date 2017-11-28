@@ -33,8 +33,7 @@ class DiscordPlugin(object):
     #         "timer_start(20, 'DiscordUpdatePresence', { 'repeat': -1 })"
     #     )
     #
-    @neovim.command("DiscordUpdatePresence")
-    def update_presence(self):
+    def check_init(self):
         if not self.lock:
             self.lock = PidLock(join(get_tempdir(), "dnvim_lock"))
         if self.locked:
@@ -50,6 +49,10 @@ class DiscordPlugin(object):
             self.discord.connect()
             self.discord.handshake(client_id)
             atexit.register(self.shutdown)
+
+    @neovim.command("DiscordUpdatePresence")
+    def update_presence(self):
+        self.check_init()
         ro = self.get_current_buf_var("&ro")
         if ro:
             return
@@ -68,6 +71,19 @@ class DiscordPlugin(object):
             )
             return
         self.log("info: update presence")
+        self._update_presence(filename, ft, workspace)
+
+    @neovim.command("DiscordForceUpdatePresence")
+    def force_update_presence(self):
+        self.check_init()
+        filename = self.vim.current.buffer.name
+        if not filename:
+            return
+        ft = self.get_current_buf_var("&ft")
+        if not ft:
+            return
+        workspace = self.get_workspace()
+        self.log("info: forced presence update")
         self._update_presence(filename, ft, workspace)
 
     def _update_presence(self, filename, ft, workspace):
