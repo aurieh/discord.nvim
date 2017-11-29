@@ -16,10 +16,10 @@ def handle_lock(plugin):
         yield
     except NoDiscordClientError:
         plugin.locked = True
-        plugin.log("error: local discord client not found")
+        plugin.log_warning("local discord client not found")
     except ReconnectError:
         plugin.locked = True
-        plugin.log("error: ran out of reconnect attempts")
+        plugin.log_error("ran out of reconnect attempts")
 
 
 @neovim.plugin
@@ -27,7 +27,6 @@ class DiscordPlugin(object):
     def __init__(self, vim):
         self.vim = vim
         self.discord = None
-        self.log_ = ""
         # Ratelimits
         self.lock = None
         self.locked = False
@@ -47,15 +46,17 @@ class DiscordPlugin(object):
         if self.locked:
             return
         if not self.discord:
-            client_id = self.vim.call("discord#GetClientID")
+            client_id = self.vim.vars.get("discord_clientid")
+            reconnect_threshold = \
+                self.vim.vars.get("discord_reconnect_threshold")
             self.locked = not self.lock.lock()
             if self.locked:
-                self.log("warn: pidfile exists")
+                self.log_warning("pidfile exists")
                 return
-            self.discord = Discord(client_id)
+            self.discord = Discord(client_id, reconnect_threshold)
             with handle_lock(self):
                 self.discord.connect()
-                self.log("info: init")
+                self.log_debug("init")
             if self.locked:
                 return
             atexit.register(self.shutdown)
@@ -76,7 +77,7 @@ class DiscordPlugin(object):
                 "timer_start", 15, "_DiscordRunScheduled"
             )
             return
-        self.log("info: update presence")
+        self.log_debug("update presence")
         with handle_lock(self):
             self._update_presence(filename, ft, workspace)
 
@@ -110,10 +111,6 @@ class DiscordPlugin(object):
         self.cbtimer = None
         self.update_presence()
 
-    @neovim.function("DiscordGetLog", sync=True)
-    def get_log(self, args):
-        return self.log_
-
     def is_ratelimited(self, filename):
         if self.lastfilename == filename:
             return True
@@ -126,8 +123,14 @@ class DiscordPlugin(object):
             return True
         self.lastused = True
 
-    def log(self, message):
-        self.log_ += str(message) + "\n"
+    def log_debug(self, message, trace=None):
+        self.vim.call("discord#LogDebug", message, trace)
+
+    def log_warning(self, message, trace=None):
+        self.vim.call("discord#LogWarn", message, trace)
+
+    def log_error(self, message, trace=None):
+        self.vim.call("discord#LogError", message, trace)
 
     def shutdown(self):
         self.lock.unlock()

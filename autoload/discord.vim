@@ -1,11 +1,3 @@
-function! discord#GetClientID()
-  if exists('g:discord_clientid')
-    return g:discord_clientid
-  else
-    return '383069395896762369'
-  endif
-endfunction
-
 " Stolen from https://github.com/w0rp/ale/blob/master/autoload/ale/path.vim#L46
 function! discord#FindNearestDir(buffer, directory_name)
   let l:buffer_filename = fnamemodify(bufname(a:buffer), ':p')
@@ -27,4 +19,21 @@ function! discord#GetProjectDir(buffer)
     endif
   endfor
   return ''
+endfunction
+
+function! discord#LogDebug(message, trace)
+  call add(g:discord_trace, a:trace)
+  if g:discord_log_debug
+    echomsg '[discord] ' . a:message
+  endif
+endfunction
+
+function! discord#LogWarn(message, trace)
+  call add(g:discord_trace, a:trace)
+  echohl WarningMsg | echomsg '[discord] ' . a:message | echohl None
+endfunction
+
+function! discord#LogError(message, trace)
+  call add(g:discord_trace, a:trace)
+  echohl ErrorMsg | echomsg '[discord] ' . a:message | echohl None
 endfunction
