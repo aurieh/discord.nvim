@@ -1,9 +1,18 @@
-import socket
-import uuid
-import struct
+from contextlib import suppress, contextmanager
 import enum
 import json
 import os
+import socket
+import struct
+import uuid
+
+
+@contextmanager
+def reconnect_on_failure(discord):
+    try:
+        yield
+    except (socket.error, BrokenPipeError, ConnectionResetError):
+        discord.reconnect()
 
 
 class OP(enum.Enum):
@@ -29,47 +38,101 @@ class Message:
         }
 
 
+class DiscordError(Exception):
+    pass
+
+
+class NoDiscordClientError(DiscordError):
+    pass
+
+
+class ReconnectError(DiscordError):
+    pass
+
+
 class Discord(object):
-    def __init__(self):
+    def __init__(self, client_id=None, reconnect_threshold=5):
+        # Reconnect props
+        self.reconnect_threshold = reconnect_threshold
+        self.reconnect_counter = 0
+
+        # Sockets
         self.sock = None
-        env_vars = ["XDG_RUNTIME_DIR", "TMPDIR", "TMP", "TEMP"]
+
+        # Discord
         # Stolen from https://github.com/GiovanniMCMXCIX/PyDiscordRPC/blob/master/rpc.py
+        env_vars = ['XDG_RUNTIME_DIR', 'TMPDIR', 'TMP', 'TEMP']
         path = next((os.environ.get(path, None) for path in env_vars if path in os.environ), '/tmp')
         self.ipc_path = f"{path}/discord-ipc-0"
+        self.client_id = client_id
 
-    def connect(self):
+    def connect(self, client_id=None):
+        try:
+            os.stat(self.ipc_path)
+        except FileNotFoundError:
+            raise NoDiscordClientError()
+        self.client_id = self.client_id or client_id
         self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-        self.sock.connect(self.ipc_path)
-        return self.sock
+        try:
+            self.sock.connect(self.ipc_path)
+        except (ConnectionAbortedError, ConnectionRefusedError):
+            raise NoDiscordClientError()
+        self.handshake()
+
+    def disconnect(self):
+        with suppress(socket.error, OSError, BrokenPipeError):
+            self.sock.close()
+        self.sock = None
 
     def send(self, op, payload):
         if isinstance(op, OP):
             op = op.value
         payload = json.dumps(payload).encode("utf8")
         body = struct.pack("<ii", op, len(payload)) + payload
-        return self.sock.sendall(body)
+        with reconnect_on_failure(self):
+            return self.sock.sendall(body)
+        return None
+
+    def set_activity(self, activity, pid=os.getpid()):
+        nonce = str(uuid.uuid4())
+        self.send(OP.FRAME, Message.set_activity(activity, nonce, pid))
+        op, length = self.recv()
+        if not op and not length:
+            # There was a successful reconnect attempt
+            return self.set_activity(activity, pid)
+        body = self.recv_body(length)
+        if not body:
+            return self.set_activity(activity, pid)
+        assert body["evt"] != "ERROR"
+        assert body["cmd"] == "SET_ACTIVITY"
+        assert body["nonce"] == nonce
+
+    def shutdown(self):
+        with suppress(socket.error, OSError, BrokenPipeError):
+            self.send(OP.CLOSE, {})
+        self.disconnect()
 
     def recv(self):
-        data = self.sock.recv(8)
-        return struct.unpack("<ii", data)
+        with reconnect_on_failure(self):
+            return struct.unpack("<ii", self.sock.recv(8))
+        return (None, None)
 
-    def handshake(self, client_id):
-        self.send(OP.AUTHENTICATE, Message.authenticate(str(client_id)))
+    def recv_body(self, length):
+        with reconnect_on_failure(self):
+            return json.loads(self.sock.recv(length).decode("utf8"))
+        return None
+
+    def handshake(self):
+        self.send(OP.AUTHENTICATE, Message.authenticate(str(self.client_id)))
         op, length = self.recv()
         assert op == OP.FRAME.value
-        body = json.loads(self.sock.recv(length).decode("utf8"))
+        body = self.recv_body(length)
         assert body["evt"] == "READY"
         return body
 
-    def set_activity(self, activity, pid=None):
-        nonce = str(uuid.uuid4())
-        self.send(OP.FRAME, Message.set_activity(activity, nonce))
-        op, length = self.recv()
-        assert op == OP.FRAME.value
-        body = json.loads(self.sock.recv(length).decode("utf8"))
-        assert body["cmd"] == "SET_ACTIVITY"
-        assert body["nonce"] == nonce
-        return body
-
-    def shutdown(self):
-        self.send(OP.CLOSE, {})
+    def reconnect(self):
+        if self.reconnect_counter > self.reconnect_threshold:
+            raise ReconnectError("reconnect_counter > reconnect_threshold")
+        self.disconnect()
+        self.reconnect_counter += 1
+        self.connect(self.client_id)

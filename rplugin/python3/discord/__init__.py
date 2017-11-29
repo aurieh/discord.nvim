@@ -1,5 +1,6 @@
-from .discord_rpc import Discord
+from .discord_rpc import Discord, NoDiscordClientError, ReconnectError
 from .pidlock import PidLock, get_tempdir
+from contextlib import contextmanager
 from os.path import join, basename
 from time import time
 import atexit
@@ -7,6 +8,18 @@ import neovim
 
 
 FT_BLACKLIST = ["help"]
+
+
+@contextmanager
+def handle_lock(plugin):
+    try:
+        yield
+    except NoDiscordClientError:
+        plugin.locked = True
+        plugin.log("error: local discord client not found")
+    except ReconnectError:
+        plugin.locked = True
+        plugin.log("error: ran out of reconnect attempts")
 
 
 @neovim.plugin
@@ -27,12 +40,6 @@ class DiscordPlugin(object):
     def on_bufenter(self):
         self.update_presence()
 
-    # @neovim.comand("DiscordStartTimer")
-    # def start_timer(self):
-    #     self.vim.eval(
-    #         "timer_start(20, 'DiscordUpdatePresence', { 'repeat': -1 })"
-    #     )
-    #
     @neovim.command("DiscordUpdatePresence")
     def update_presence(self):
         if not self.lock:
@@ -41,14 +48,16 @@ class DiscordPlugin(object):
             return
         if not self.discord:
             client_id = self.vim.eval("discord#GetClientID()")
-            self.log("info: init")
             self.locked = not self.lock.lock()
             if self.locked:
                 self.log("warn: pidfile exists")
                 return
-            self.discord = Discord()
-            self.discord.connect()
-            self.discord.handshake(client_id)
+            self.discord = Discord(client_id)
+            with handle_lock(self):
+                self.discord.connect()
+                self.log("info: init")
+            if self.locked:
+                return
             atexit.register(self.shutdown)
         ro = self.get_current_buf_var("&ro")
         if ro:
@@ -68,7 +77,8 @@ class DiscordPlugin(object):
             )
             return
         self.log("info: update presence")
-        self._update_presence(filename, ft, workspace)
+        with handle_lock(self):
+            self._update_presence(filename, ft, workspace)
 
     def _update_presence(self, filename, ft, workspace):
         activity = {}
