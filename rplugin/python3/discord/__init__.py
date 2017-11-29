@@ -47,7 +47,7 @@ class DiscordPlugin(object):
         if self.locked:
             return
         if not self.discord:
-            client_id = self.vim.eval("discord#GetClientID()")
+            client_id = self.vim.call("discord#GetClientID")
             self.locked = not self.lock.lock()
             if self.locked:
                 self.log("warn: pidfile exists")
@@ -71,9 +71,9 @@ class DiscordPlugin(object):
         workspace = self.get_workspace()
         if self.is_ratelimited(filename):
             if self.cbtimer:
-                self.vim.eval("timer_stop({})".format(self.cbtimer))
-            self.cbtimer = self.vim.eval(
-                "timer_start(15, '_DiscordRunScheduled')"
+                self.vim.call("timer_stop", self.cbtimer)
+            self.cbtimer = self.vim.call(
+                "timer_start", 15, "_DiscordRunScheduled"
             )
             return
         self.log("info: update presence")
@@ -93,16 +93,14 @@ class DiscordPlugin(object):
             activity["assets"]["small_image"] = ft
         if workspace:
             activity["state"] = "Working on {}".format(workspace)
-        self.discord.set_activity(activity, self.vim.eval("getpid()"))
+        self.discord.set_activity(activity, self.vim.call("getpid"))
 
     def get_current_buf_var(self, var):
-        return self.vim.eval(
-            "getbufvar({}, '{}')".format(self.vim.current.buffer.number, var)
-        )
+        return self.vim.call("getbufvar", self.vim.current.buffer.number, var)
 
     def get_workspace(self):
         bufnr = self.vim.current.buffer.number
-        dirpath = self.vim.eval("discord#GetProjectDir({})".format(bufnr))
+        dirpath = self.vim.call("discord#GetProjectDir", bufnr)
         if dirpath:
             return basename(dirpath)
         return None
