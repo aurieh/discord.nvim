@@ -19,7 +19,8 @@ CONTENTS                                                     *discord-contents*
 ===============================================================================
 INTRODUCTION                                             *discord-introduction*
 
-Display file and project info on Discord.
+Display file and project info on Discord. This plugin requires |timers| and
+|nvim|.
 
 ===============================================================================
 INTERFACE                                                   *discord-interface*
