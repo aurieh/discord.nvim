@@ -26,3 +26,4 @@ To finish things off, call `:UpdateRemotePlugins` and restart Neovim.
 - [X] Documentation
 - [ ] Tests
 - [ ] Pack ratelimit data in pidfiles
+- [ ] Yarp

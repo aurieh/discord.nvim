@@ -1,6 +1,6 @@
 *discord.txt*  Discord Rich Presence for Neovim.
 
-Version: 0.0.1
+Version: 0.0.2
 Author: aurieh <me@aurieh.me>
 License: BSD 3-clause
 
