@@ -23,6 +23,6 @@ To finish things off, call `:UpdateRemotePlugins` and restart Neovim.
 - [X] Rewrite the client in pure python, no cffi
 - [X] Upload some language icons
 - [X] Make the client ID configurable
-- [ ] Documentation
+- [X] Documentation
 - [ ] Tests
 - [ ] Pack ratelimit data in pidfiles

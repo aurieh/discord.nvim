@@ -1,0 +1,61 @@
+*discord.txt*  Discord Rich Presence for Neovim.
+
+Version: 0.0.1
+Author: aurieh <me@aurieh.me>
+License: BSD 3-clause
+
+===============================================================================
+CONTENTS                                                     *discord-contents*
+
+  1. Introduction                                        |discord-introduction|
+  2. Interface                                              |discord-interface|
+    2.1 Variables                                           |discord-variables|
+      2.1.1 g:discord_clientid                             |g:discord_clientid|
+      2.1.2 g:discord_reconnect_threshold       |g:discord_reconnect_threshold|
+      2.1.3 g:discord_log_debug                           |g:discord_log_debug|
+    2.2 Commands                                             |discord-commands|
+      2.2.1 DiscordUpdatePresence                       |DiscordUpdatePresence|
+
+===============================================================================
+INTRODUCTION                                             *discord-introduction*
+
+Display file and project info on Discord.
+
+===============================================================================
+INTERFACE                                                   *discord-interface*
+
+-------------------------------------------------------------------------------
+VARIABLES                                                   *discord-variables*
+
+g:discord_clientid                                         *g:discord_clientid*
+
+    Type: |String|
+    Default: `383069395896762369`
+
+    The plugin comes with a large selection of language icon assets, however,
+    if you want to upload your own, you'll have to create a Discord dev app
+    and pass its ID as this variable.
+
+g:discord_reconnect_threshold                   *g:discord_reconnect_threshold*
+
+    Type |Number|
+    Default: `5`
+
+    Times to reconnect before giving up.
+
+g:discord_log_debug                                       *g:discord_log_debug*
+
+    Type: |Number|
+    Default: `0`
+
+    Enables or disables debug logging.
+
+-------------------------------------------------------------------------------
+COMMANDS                                                     *discord-commands*
+
+DiscordUpdatePresence                                   *DiscordUpdatePresence*
+
+    Update presence. You probably won't ever need to call this command
+    manually, as the plugin comes with a |BufEnter| autocommand.
+
+vim: ft=help
