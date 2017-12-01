@@ -63,7 +63,7 @@ class Discord(object):
         # Stolen from https://github.com/GiovanniMCMXCIX/PyDiscordRPC/blob/master/rpc.py
         env_vars = ['XDG_RUNTIME_DIR', 'TMPDIR', 'TMP', 'TEMP']
         path = next((os.environ.get(path, None) for path in env_vars if path in os.environ), '/tmp')
-        self.ipc_path = f"{path}/discord-ipc-0"
+        self.ipc_path = "{}/discord-ipc-0".format(path)
         self.client_id = client_id
 
     def connect(self, client_id=None):
