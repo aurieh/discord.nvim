@@ -12,7 +12,7 @@ function! discord#FindNearestDir(buffer, directory_name)
 endfunction
 
 function! discord#GetProjectDir(buffer)
-  for l:vcs_dir in ['.git', '.hg']
+  for l:vcs_dir in ['.git', '.hg', '.bzr', '_darcs', '.svn']
     let l:dir = discord#FindNearestDir(a:buffer, l:vcs_dir)
     if !empty(l:dir)
       return fnamemodify(l:dir, ':h:h')
