@@ -103,7 +103,6 @@ class Discord(object):
         body = self.recv_body(length)
         if not body:
             return self.set_activity(activity, pid)
-        assert body["evt"] != "ERROR"
         assert body["cmd"] == "SET_ACTIVITY"
         assert body["nonce"] == nonce
 
@@ -119,7 +118,10 @@ class Discord(object):
 
     def recv_body(self, length):
         with reconnect_on_failure(self):
-            return json.loads(self.sock.recv(length).decode("utf8"))
+            body = json.loads(self.sock.recv(length).decode("utf8"))
+            if body["evt"] == "ERROR":
+                raise DiscordError(body["data"]["message"])
+            return body
         return None
 
     def handshake(self):
