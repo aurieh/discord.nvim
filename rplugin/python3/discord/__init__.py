@@ -90,6 +90,8 @@ class DiscordPlugin(object):
         }
         activity["timestamps"] = {"start": time()}
         if ft:
+            if len(ft) == 1:
+                ft = "lang_{}".format(ft)
             activity["assets"]["small_text"] = ft
             activity["assets"]["small_image"] = ft
         if workspace:
