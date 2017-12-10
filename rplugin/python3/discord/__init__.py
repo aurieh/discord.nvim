@@ -7,7 +7,7 @@ import atexit
 import neovim
 
 
-FT_BLACKLIST = ["help"]
+FT_BLACKLIST = ["help", "nerdtree"]
 
 
 @contextmanager
