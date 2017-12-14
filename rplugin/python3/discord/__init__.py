@@ -55,7 +55,11 @@ class DiscordPlugin(object):
                 return
             self.discord = Discord(client_id, reconnect_threshold)
             with handle_lock(self):
-                self.discord.connect()
+                try:
+                    self.discord.connect()
+                except:
+                    self.log_debug("connection failed")
+                    return
                 self.log_debug("init")
             if self.locked:
                 return
