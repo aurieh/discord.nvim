@@ -51,6 +51,14 @@ g:discord_log_debug                                       *g:discord_log_debug*
 
     Enables or disables debug logging.
 
+g:discord_blacklist                                       *g:discord_blacklist*
+
+    Type: List
+    Default: []
+
+    List of regexes that are matched against all filenames. If one matches,
+    the buffer is ignored.
+
 -------------------------------------------------------------------------------
 COMMANDS                                                     *discord-commands*
 

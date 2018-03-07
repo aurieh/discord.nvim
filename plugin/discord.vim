@@ -20,4 +20,7 @@ endif
 if !exists('g:discord_log_debug')
   let g:discord_log_debug = 0
 endif
+if !exists('g:discord_blacklist')
+  let g:discord_blacklist = []
+endif
 let g:discord_trace = []

@@ -1,11 +1,13 @@
-from .discord_rpc import Discord, NoDiscordClientError, ReconnectError
-from .pidlock import PidLock, get_tempdir
-from contextlib import contextmanager
-from os.path import join, basename
-from time import time
 import atexit
+import re
+from contextlib import contextmanager
+from os.path import basename, join
+from time import time
+
 import neovim
 
+from .discord_rpc import Discord, NoDiscordClientError, ReconnectError
+from .pidlock import PidLock, get_tempdir
 
 FT_BLACKLIST = ["help", "nerdtree"]
 
@@ -27,6 +29,7 @@ class DiscordPlugin(object):
     def __init__(self, vim):
         self.vim = vim
         self.discord = None
+        self.blacklist = []
         # Ratelimits
         self.lock = None
         self.locked = False
@@ -34,6 +37,12 @@ class DiscordPlugin(object):
         self.lastused = False
         self.lasttimestamp = time()
         self.cbtimer = None
+
+    @neovim.autocmd("VimEnter", "*")
+    def on_vimenter(self):
+        self.blacklist = [
+            re.compile(x) for x in self.vim.vars.get("discord_blacklist")
+        ]
 
     @neovim.autocmd("BufEnter", "*")
     def on_bufenter(self):
@@ -66,16 +75,19 @@ class DiscordPlugin(object):
         filename = self.vim.current.buffer.name
         if not filename:
             return
+        self.log_debug('filename: {}'.format(filename))
+        if any(it.match(filename) for it in self.blacklist):
+            return
         ft = self.get_current_buf_var("&ft")
+        self.log_debug('ft: {}'.format(ft))
         if ft in FT_BLACKLIST:
             return
         workspace = self.get_workspace()
         if self.is_ratelimited(filename):
             if self.cbtimer:
                 self.vim.call("timer_stop", self.cbtimer)
-            self.cbtimer = self.vim.call(
-                "timer_start", 15, "_DiscordRunScheduled"
-            )
+            self.cbtimer = self.vim.call("timer_start", 15,
+                                         "_DiscordRunScheduled")
             return
         self.log_debug("update presence")
         with handle_lock(self):
