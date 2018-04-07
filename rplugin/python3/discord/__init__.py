@@ -9,8 +9,6 @@ import neovim
 from .discord_rpc import Discord, NoDiscordClientError, ReconnectError
 from .pidlock import PidLock, get_tempdir
 
-FT_BLACKLIST = ["help", "nerdtree"]
-
 
 @contextmanager
 def handle_lock(plugin):
@@ -30,6 +28,8 @@ class DiscordPlugin(object):
         self.vim = vim
         self.discord = None
         self.blacklist = []
+        self.fts_blacklist = []
+        self.fts_whitelist = []
         # Ratelimits
         self.lock = None
         self.locked = False
@@ -43,6 +43,8 @@ class DiscordPlugin(object):
         self.blacklist = [
             re.compile(x) for x in self.vim.vars.get("discord_blacklist")
         ]
+        self.fts_blacklist = self.vim.vars.get("discord_fts_blacklist")
+        self.fts_whitelist = self.vim.vars.get("discord_fts_whitelist")
 
     @neovim.autocmd("BufEnter", "*")
     def on_bufenter(self):
@@ -80,7 +82,7 @@ class DiscordPlugin(object):
             return
         ft = self.get_current_buf_var("&ft")
         self.log_debug('ft: {}'.format(ft))
-        if ft in FT_BLACKLIST:
+        if ft in self.fts_blacklist or ft not in self.fts_whitelist:
             return
         workspace = self.get_workspace()
         if self.is_ratelimited(filename):

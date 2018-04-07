@@ -23,4 +23,57 @@ endif
 if !exists('g:discord_blacklist')
   let g:discord_blacklist = []
 endif
-let g:discord_trace = []
+if !exists('g:discord_trace')
+  let g:discord_trace = []
+endif
+if !exists('g:discord_fts_whitelist')
+  let g:discord_fts_whitelist = [
+        \'asm',
+        \'c',
+        \'chef',
+        \'coffee',
+        \'cpp',
+        \'crystal',
+        \'cs',
+        \'css',
+        \'d',
+        \'dart',
+        \'diff',
+        \'dockerfile',
+        \'elixir',
+        \'erlang',
+        \'git',
+        \'gitconfig',
+        \'gitignore',
+        \'go',
+        \'haskell',
+        \'html',
+        \'javascript',
+        \'json',
+        \'jsx',
+        \'kotlin',
+        \'lang_c',
+        \'lang_d',
+        \'less',
+        \'lua',
+        \'markdown',
+        \'neovim',
+        \'nix',
+        \'perl',
+        \'php',
+        \'python',
+        \'ruby',
+        \'rust',
+        \'sass',
+        \'scss',
+        \'swagger',
+        \'tex',
+        \'tf',
+        \'vim',
+        \'xml',
+        \'yaml',
+        \]
+endif
+if !exists('g:discord_fts_blacklist')
+  let g:discord_fts_blacklist = ['help', 'nerdtree']
+endif
