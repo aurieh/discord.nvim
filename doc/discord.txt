@@ -1,6 +1,6 @@
-*discord.txt*  Discord Rich Presence for Neovim.
+*discord*  Discord Rich Presence for Neovim.
 
-Version: 0.0.2
+Version: 0.0.3
 Author: aurieh <me@aurieh.me>
 License: BSD 3-clause
 
@@ -10,9 +10,10 @@ CONTENTS                                                     *discord-contents*
   1. Introduction                                        |discord-introduction|
   2. Interface                                              |discord-interface|
     2.1 Variables                                           |discord-variables|
-      2.1.1 g:discord_clientid                             |g:discord_clientid|
-      2.1.2 g:discord_reconnect_threshold       |g:discord_reconnect_threshold|
-      2.1.3 g:discord_log_debug                           |g:discord_log_debug|
+      2.1.1 g:discord_activate_on_enter           |g:discord_activate_on_enter|
+      2.1.2 g:discord_clientid                             |g:discord_clientid|
+      2.1.3 g:discord_reconnect_threshold       |g:discord_reconnect_threshold|
+      2.1.4 g:discord_log_debug                           |g:discord_log_debug|
     2.2 Commands                                             |discord-commands|
       2.2.1 DiscordUpdatePresence                       |DiscordUpdatePresence|
 
@@ -27,6 +28,13 @@ INTERFACE                                                   *discord-interface*
 
 -------------------------------------------------------------------------------
 VARIABLES                                                   *discord-variables*
+
+g:discord_activate_on_enter                       *g:discord_activate_on_enter*
+
+    Type: |Number|
+    Default: `1`
+
+    Enables or disables automatic activation of the rich presence.
 
 g:discord_clientid                                         *g:discord_clientid*
 
@@ -64,7 +72,7 @@ COMMANDS                                                     *discord-commands*
 
 DiscordUpdatePresence                                   *DiscordUpdatePresence*
 
-    Update presence. You probably won't ever need to call this command
-    manually, as the plugin comes with a |BufEnter| autocommand.
+    Update presence. If g:discord_activate_on_enter is set to 0 it will
+    activate the presence.
 
 vim: ft=help
