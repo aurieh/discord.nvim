@@ -26,6 +26,7 @@ def handle_lock(plugin):
 class DiscordPlugin(object):
     def __init__(self, vim):
         self.vim = vim
+        self.activate = self.vim.vars.get("discord_activate_on_enter")
         self.discord = None
         self.blacklist = []
         self.fts_blacklist = []
@@ -48,10 +49,14 @@ class DiscordPlugin(object):
 
     @neovim.autocmd("BufEnter", "*")
     def on_bufenter(self):
+        if self.activate == 0:
+            return 1
         self.update_presence()
 
     @neovim.command("DiscordUpdatePresence")
     def update_presence(self):
+        if self.activate == 0:
+            self.activate = 1
         if not self.lock:
             self.lock = PidLock(join(get_tempdir(), "dnvim_lock"))
         if self.locked:

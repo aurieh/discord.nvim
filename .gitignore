@@ -71,3 +71,4 @@ target/
 Session.vim
 .netrwhist
 *~
+doc/tags

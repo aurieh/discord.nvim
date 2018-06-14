@@ -11,6 +11,9 @@ if !has('python3')
   finish
 endif
 
+if !exists('g:discord_activate_on_enter')
+    let g:discord_activate_on_enter = 1
+endif
 if !exists('g:discord_clientid')
   let g:discord_clientid = '383069395896762369'
 endif
