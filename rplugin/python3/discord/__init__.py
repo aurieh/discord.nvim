@@ -27,6 +27,7 @@ class DiscordPlugin(object):
     def __init__(self, vim):
         self.vim = vim
         self.activate = self.vim.vars.get("discord_activate_on_enter")
+        self.activity = {}
         self.discord = None
         self.blacklist = []
         self.fts_blacklist = []
@@ -49,14 +50,19 @@ class DiscordPlugin(object):
 
     @neovim.autocmd("BufEnter", "*")
     def on_bufenter(self):
-        if self.activate == 0:
-            return 1
-        self.update_presence()
+        if self.activate != 0:
+            self.update_presence()
 
     @neovim.command("DiscordUpdatePresence")
     def update_presence(self):
         if self.activate == 0:
             self.activate = 1
+        if not self.activity:
+            self.activity["assets"] = {
+                "large_text": "The One True Editor",
+                "large_image": "neovim"
+            }
+            self.activity["timestamps"] = {"start": time()}
         if not self.lock:
             self.lock = PidLock(join(get_tempdir(), "dnvim_lock"))
         if self.locked:
@@ -101,21 +107,15 @@ class DiscordPlugin(object):
             self._update_presence(filename, ft, workspace)
 
     def _update_presence(self, filename, ft, workspace):
-        activity = {}
-        activity["details"] = "Editing {}".format(basename(filename))
-        activity["assets"] = {
-            "large_text": "The One True Editor",
-            "large_image": "neovim"
-        }
-        activity["timestamps"] = {"start": time()}
+        self.activity["details"] = "Editing {}".format(basename(filename))
         if ft:
             if len(ft) == 1:
                 ft = "lang_{}".format(ft)
-            activity["assets"]["small_text"] = ft
-            activity["assets"]["small_image"] = ft
+            self.activity["assets"]["small_text"] = ft.title()
+            self.activity["assets"]["small_image"] = ft
         if workspace:
-            activity["state"] = "Working on {}".format(workspace)
-        self.discord.set_activity(activity, self.vim.call("getpid"))
+            self.activity["state"] = "Working on {}".format(workspace)
+        self.discord.set_activity(self.activity, self.vim.call("getpid"))
 
     def get_current_buf_var(self, var):
         return self.vim.call("getbufvar", self.vim.current.buffer.number, var)
