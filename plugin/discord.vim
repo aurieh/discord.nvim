@@ -69,6 +69,7 @@ if !exists('g:discord_fts_whitelist')
         \'rust',
         \'sass',
         \'scss',
+        \'sh',
         \'swagger',
         \'tex',
         \'tf',
