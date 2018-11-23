@@ -37,7 +37,7 @@ class DiscordPlugin(object):
         self.locked = False
         self.lastfilename = None
         self.lastused = False
-        self.lasttimestamp = time()
+        self.lasttimestamp = int(time())
         self.cbtimer = None
 
     @neovim.autocmd("VimEnter", "*")
@@ -62,7 +62,7 @@ class DiscordPlugin(object):
                 "large_text": "The One True Editor",
                 "large_image": "neovim"
             }
-            self.activity["timestamps"] = {"start": time()}
+            self.activity["timestamps"] = {"start": int(time())}
         if not self.lock:
             self.lock = PidLock(join(get_tempdir(), "dnvim_lock"))
         if self.locked:
@@ -136,7 +136,7 @@ class DiscordPlugin(object):
         if self.lastfilename == filename:
             return True
         self.lastfilename = filename
-        now = time()
+        now = int(time())
         if (now - self.lasttimestamp) >= 15:
             self.lastused = False
             self.lasttimestamp = now
