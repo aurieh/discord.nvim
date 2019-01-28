@@ -135,7 +135,6 @@ class DiscordPlugin(object):
     def is_ratelimited(self, filename):
         if self.lastfilename == filename:
             return True
-        self.lastfilename = filename
         now = int(time())
         if (now - self.lasttimestamp) >= 15:
             self.lastused = False
@@ -143,6 +142,7 @@ class DiscordPlugin(object):
         if self.lastused:
             return True
         self.lastused = True
+        self.lastfilename = filename
 
     def log_debug(self, message, trace=None):
         self.vim.call("discord#LogDebug", message, trace)
