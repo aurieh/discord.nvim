@@ -22,18 +22,24 @@ function! discord#GetProjectDir(buffer)
 endfunction
 
 function! discord#LogDebug(message, trace)
-  call add(g:discord_trace, a:trace)
+  if a:trace != v:null
+    call add(g:discord_trace, a:trace)
+  endif
   if g:discord_log_debug
     echomsg '[discord] ' . a:message
   endif
 endfunction
 
 function! discord#LogWarn(message, trace)
-  call add(g:discord_trace, a:trace)
+  if a:trace != v:null
+    call add(g:discord_trace, a:trace)
+  endif
   echohl WarningMsg | echomsg '[discord] ' . a:message | echohl None
 endfunction
 
 function! discord#LogError(message, trace)
-  call add(g:discord_trace, a:trace)
+  if a:trace != v:null
+    call add(g:discord_trace, a:trace)
+  endif
   echohl ErrorMsg | echomsg '[discord] ' . a:message | echohl None
 endfunction
