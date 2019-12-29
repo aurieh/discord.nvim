@@ -40,7 +40,7 @@ class DiscordPlugin(object):
         self.lasttimestamp = int(time())
         self.cbtimer = None
 
-    @neovim.autocmd("VimEnter", "*")
+    @neovim.autocmd("VimEnter", "*", sync=True)
     def on_vimenter(self):
         self.blacklist = [
             re.compile(x) for x in self.vim.vars.get("discord_blacklist")
@@ -48,7 +48,7 @@ class DiscordPlugin(object):
         self.fts_blacklist = self.vim.vars.get("discord_fts_blacklist")
         self.fts_whitelist = self.vim.vars.get("discord_fts_whitelist")
 
-    @neovim.autocmd("BufEnter", "*")
+    @neovim.autocmd("BufEnter", "*", sync=True)
     def on_bufenter(self):
         if self.activate != 0:
             self.update_presence()
