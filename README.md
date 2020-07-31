@@ -18,6 +18,10 @@ call dein#add('aurieh/discord.nvim')
 ```
 To finish things off, call `:UpdateRemotePlugins` and restart Neovim.
 
+## Uninstall
+1. Remove the line used to add the Plugin in your `init.vim`
+2. Run `:UpdateRemotePlugins` inside of vim.
+
 # TODO
 - [ ] Multiple clients: wait for lock
 - [X] Rewrite the client in pure python, no cffi
