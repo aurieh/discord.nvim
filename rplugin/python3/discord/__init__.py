@@ -47,6 +47,7 @@ class DiscordPlugin(object):
         ]
         self.fts_blacklist = self.vim.vars.get("discord_fts_blacklist")
         self.fts_whitelist = self.vim.vars.get("discord_fts_whitelist")
+        self.project_url = self.vim.vars.get("discord_project_url")
 
     @neovim.autocmd("BufEnter", "*", sync=True)
     def on_bufenter(self):
@@ -63,6 +64,10 @@ class DiscordPlugin(object):
                 "large_image": "neovim"
             }
             self.activity["timestamps"] = {"start": int(time())}
+            if self.project_url:
+                self.activity["buttons"] = [
+                    {"label": "Open project URL", "url": self.project_url}
+                ]
         if not self.lock:
             self.lock = PidLock(join(get_tempdir(), "dnvim_lock"))
         if self.locked:
