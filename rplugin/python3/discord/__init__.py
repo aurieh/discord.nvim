@@ -32,6 +32,7 @@ class DiscordPlugin(object):
         self.blacklist = []
         self.fts_blacklist = []
         self.fts_whitelist = []
+        self.project_url = None
         # Ratelimits
         self.lock = None
         self.locked = False
