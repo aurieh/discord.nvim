@@ -19,9 +19,6 @@ call dein#add('aurieh/discord.nvim')
 
 To finish things off, call `:UpdateRemotePlugins` and restart Neovim.
 
-In Discord, under `Gaming Settings -> Game Activity`, add `aurieh/discord.nvim:
-Discord Rich Presence for Neovim` as a game by choosing "Add it".
-
 After that, you **must** enable the "Display currently running game as a status
 message" option under `Gaming Settings -> Game Activity`.
 
