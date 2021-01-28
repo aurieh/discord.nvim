@@ -16,7 +16,7 @@ $ git clone https://github.com/aurieh/discord.nvim.git "$DNVIM_HOME"
 Then, in Neovim, call `:UpdateRemotePlugins`. For your custom status to show up
 on Discord,
 "Display currently running game as a status message" must be enabled under
-**Settings** -> (App settings) **Games**.
+**Settings** -> (Gaming Settings) **Game Activity**.
 
 ## Uninstall
 ```sh
