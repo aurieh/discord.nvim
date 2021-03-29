@@ -14,7 +14,8 @@ CONTENTS                                                     *discord-contents*
       2.1.2 g:discord_clientid                             |g:discord_clientid|
       2.1.3 g:discord_reconnect_threshold       |g:discord_reconnect_threshold|
       2.1.4 g:discord_log_debug                           |g:discord_log_debug|
-      2.1.5 g:discord_project_url                       |g:discord_project_url|
+      2.1.5 g:discord_log_warn                             |g:discord_log_warn|
+      2.1.6 g:discord_project_url                       |g:discord_project_url|
     2.2 Commands                                             |discord-commands|
       2.2.1 DiscordUpdatePresence                       |DiscordUpdatePresence|
 
