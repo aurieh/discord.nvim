@@ -23,6 +23,9 @@ endif
 if !exists('g:discord_log_debug')
   let g:discord_log_debug = 0
 endif
+if !exists('g:discord_log_warn')
+  let g:discord_log_warn = 1
+endif
 if !exists('g:discord_blacklist')
   let g:discord_blacklist = []
 endif
