@@ -60,6 +60,13 @@ g:discord_log_debug                                       *g:discord_log_debug*
 
     Enables or disables debug logging.
 
+g:discord_log_warn                                        *g:discord_log_warn*
+
+    Type: |Number|
+    Default: `1`
+
+    Enables or disables warning logging.
+
 g:discord_blacklist                                       *g:discord_blacklist*
 
     Type: |List|
