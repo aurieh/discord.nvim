@@ -34,7 +34,9 @@ function! discord#LogWarn(message, trace)
   if a:trace != v:null
     call add(g:discord_trace, a:trace)
   endif
-  echohl WarningMsg | echomsg '[discord] ' . a:message | echohl None
+  if g:discord_log_warn
+      echohl WarningMsg | echomsg '[discord] ' . a:message | echohl None
+  endif
 endfunction
 
 function! discord#LogError(message, trace)
