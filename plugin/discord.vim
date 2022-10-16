@@ -84,3 +84,6 @@ endif
 if !exists('g:discord_fts_blacklist')
   let g:discord_fts_blacklist = ['help', 'nerdtree']
 endif
+if !exists('g:discord_custom_assets')
+    let g:discord_custom_assets = {}
+end
