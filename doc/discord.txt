@@ -1,6 +1,6 @@
 *discord*  Discord Rich Presence for Neovim.
 
-Version: 0.0.3
+Version: 0.0.4
 Author: aurieh <me@aurieh.me>
 License: BSD 3-clause
 
@@ -15,7 +15,9 @@ CONTENTS                                                     *discord-contents*
       2.1.3 g:discord_reconnect_threshold       |g:discord_reconnect_threshold|
       2.1.4 g:discord_log_debug                           |g:discord_log_debug|
       2.1.5 g:discord_log_warn                             |g:discord_log_warn|
-      2.1.6 g:discord_project_url                       |g:discord_project_url|
+      2.1.6 g:discord_blacklist                           |g:discord_blacklist|
+      2.1.7 g:discord_project_url                       |g:discord_project_url|
+      2.1.8 g:discord_custom_assets                   |g:discord_custom_assets|
     2.2 Commands                                             |discord-commands|
       2.2.1 DiscordUpdatePresence                       |DiscordUpdatePresence|
 
@@ -83,12 +85,27 @@ g:discord_project_url                                   *g:discord_project_url*
     The project URL to show in the rich presence. No URL will be shown if
     this variable is unset or empty.
 
+g:discord_custom_assets
+
+    Type: |Dict|
+    Default: `{}`
+
+    A dictionary of custom asset URLs. The key is the filetype and the value
+    is an image URL. You must prefix the filetype with `lang_` if it's only
+    one character long (e.g. `c` -> `lang_c`). Example:
+
+    >
+    let g:discord_custom_assets = #{
+        \ custom: 'https://example.com/custom.png',
+        \ lang_c: 'https://example.com/c.png'
+        \ }
+
 -------------------------------------------------------------------------------
 COMMANDS                                                     *discord-commands*
 
 DiscordUpdatePresence                                   *DiscordUpdatePresence*
 
-    Update presence. If g:discord_activate_on_enter is set to 0 it will
+    Update presence. If |g:discord_activate_on_enter| is set to `0` it will
     activate the presence.
 
 vim: ft=help

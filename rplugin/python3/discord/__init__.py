@@ -49,6 +49,7 @@ class DiscordPlugin(object):
         self.fts_blacklist = self.vim.vars.get("discord_fts_blacklist")
         self.fts_whitelist = self.vim.vars.get("discord_fts_whitelist")
         self.project_url = self.vim.vars.get("discord_project_url")
+        self.custom_assets = self.vim.vars.get("discord_custom_assets")
 
     @neovim.autocmd("BufEnter", "*", sync=True)
     def on_bufenter(self):
@@ -99,7 +100,9 @@ class DiscordPlugin(object):
             return
         ft = self.get_current_buf_var("&ft")
         self.log_debug('ft: {}'.format(ft))
-        if ft in self.fts_blacklist or ft not in self.fts_whitelist:
+        if ft in self.fts_blacklist:
+            return
+        if ft not in self.fts_whitelist and ft not in self.custom_assets:
             return
         workspace = self.get_workspace()
         if self.is_ratelimited(filename):
@@ -118,7 +121,8 @@ class DiscordPlugin(object):
             if len(ft) == 1:
                 ft = "lang_{}".format(ft)
             self.activity["assets"]["small_text"] = ft.title()
-            self.activity["assets"]["small_image"] = ft
+            self.activity["assets"]["small_image"] = \
+                self.custom_assets.get(ft, ft)
         if workspace:
             self.activity["state"] = "Working on {}".format(workspace)
         self.discord.set_activity(self.activity, self.vim.call("getpid"))
@@ -134,7 +138,7 @@ class DiscordPlugin(object):
         return None
 
     @neovim.function("_DiscordRunScheduled")
-    def run_scheduled(self, args):
+    def run_scheduled(self, _):
         self.cbtimer = None
         self.update_presence()
 
