@@ -4,7 +4,10 @@ import json
 import os
 import socket
 import struct
+import tempfile
 import uuid
+
+IPC_SOCKET_NAME = "discord-ipc-0"
 
 
 @contextmanager
@@ -51,7 +54,7 @@ class ReconnectError(DiscordError):
 
 
 class Discord(object):
-    def __init__(self, client_id=None, reconnect_threshold=5):
+    def __init__(self, client_id, reconnect_threshold=5):
         # Reconnect props
         self.reconnect_threshold = reconnect_threshold
         self.reconnect_counter = 0
@@ -60,27 +63,41 @@ class Discord(object):
         self.sock = None
 
         # Discord
-        # Stolen from https://github.com/GiovanniMCMXCIX/PyDiscordRPC/blob/master/rpc.py
-        env_vars = ['XDG_RUNTIME_DIR', 'TMPDIR', 'TMP', 'TEMP']
-        path = next((os.environ.get(path, None) for path in env_vars if path in os.environ), '/tmp')
-        self.ipc_path = "{}/discord-ipc-0".format(path)
         self.client_id = client_id
 
+        self.ipc_directories = []
+        xdg_runtime_dir = os.getenv("XDG_RUNTIME_DIR")
+        if xdg_runtime_dir:
+            self.ipc_directories.extend([
+                xdg_runtime_dir,
+                # Flatpak
+                os.path.join(xdg_runtime_dir, "app/com.discordapp.Discord"),
+                os.path.join(xdg_runtime_dir, "app/com.discordapp.DiscordCanary"),
+                # Snap
+                os.path.join(xdg_runtime_dir, "snap.discord"),
+                os.path.join(xdg_runtime_dir, "snap.discord-canary"),
+            ])
+        self.ipc_directories.append(tempfile.gettempdir())
+
     def connect(self, client_id=None):
-        try:
-            os.stat(self.ipc_path)
-        except FileNotFoundError:
-            raise NoDiscordClientError()
         self.client_id = self.client_id or client_id
-        self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-        try:
-            self.sock.connect(self.ipc_path)
-        except (ConnectionAbortedError, ConnectionRefusedError):
+        for ipc_dir in self.ipc_directories:
+            path = os.path.join(ipc_dir, IPC_SOCKET_NAME)
+            sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            try:
+                sock.connect(path)
+            except (FileNotFoundError, ConnectionAbortedError, ConnectionRefusedError):
+                sock.close()
+                continue
+            else:
+                self.sock = sock
+                break
+        else:
             raise NoDiscordClientError()
         self.handshake()
 
     def disconnect(self):
-        with suppress(socket.error, OSError, BrokenPipeError):
+        with suppress(OSError):
             self.sock.close()
         self.sock = None
 
