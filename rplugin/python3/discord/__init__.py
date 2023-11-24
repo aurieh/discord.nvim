@@ -29,20 +29,6 @@ class DiscordPlugin(object):
         self.activate = self.vim.vars.get("discord_activate_on_enter")
         self.activity = {}
         self.discord = None
-        self.blacklist = []
-        self.fts_blacklist = []
-        self.fts_whitelist = []
-        self.project_url = None
-        # Ratelimits
-        self.lock = None
-        self.locked = False
-        self.lastfilename = None
-        self.lastused = False
-        self.lasttimestamp = int(time())
-        self.cbtimer = None
-
-    @neovim.autocmd("VimEnter", "*", sync=True)
-    def on_vimenter(self):
         self.blacklist = [
             re.compile(x) for x in self.vim.vars.get("discord_blacklist")
         ]
@@ -50,6 +36,13 @@ class DiscordPlugin(object):
         self.fts_whitelist = self.vim.vars.get("discord_fts_whitelist")
         self.project_url = self.vim.vars.get("discord_project_url")
         self.custom_assets = self.vim.vars.get("discord_custom_assets")
+        # Ratelimits
+        self.lock = None
+        self.locked = False
+        self.lastfilename = None
+        self.lastused = False
+        self.lasttimestamp = int(time())
+        self.cbtimer = None
 
     @neovim.autocmd("BufEnter", "*", sync=True)
     def on_bufenter(self):
